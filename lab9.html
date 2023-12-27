@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<head>
+<title>Phases of the Moon</title>
+<script src="https://csc8470-fall2022.github.io/lib/three.js"></script>
+<script src="https://csc8470-fall2022.github.io/lib/OrbitControls.js"></script>
+
+<script>
+    var scene, camera, renderer;  // Three.js rendering basics
+
+    var canvas;     // The canvas on which the image is rendered
+
+    var mouse;      // Used to navigate the scene with the mouse
+
+    var dirLight;   // Our directional light is global so we can change its position
+    var angle = 0;  // The angle (about the y-axis) of the directional light
+
+    // Create a camera, sitting on the positive z-axis.  The camera is not part of the scene
+    function createCamera() {
+        camera = new THREE.PerspectiveCamera(40, canvas.width/canvas.height, 0.1, 500);
+        camera.position.z = 20; // 300 pull back the camera
+
+        // Add orbit control to allow the camera orbit around
+        mouse = new THREE.OrbitControls(camera, renderer.domElement);
+    }
+
+    // Create the scene. This function is called once, as soon as the page loads.
+    // The renderer has already been created before this function is called.
+    function createScene() {        
+        renderer.setClearColor(0); // Set background color (0, or 0x000000, is black).
+
+        scene = new THREE.Scene(); // Create a new scene which we can add objects to.
+    
+        // TODO Step 4: increase number of segments and rings and notice the difference
+        var radius = 3,
+            segments = 200,
+            rings = 200;
+
+        // create the sphere
+        var sphereGeom = new THREE.SphereGeometry(radius, segments, rings);
+        var sphereMat = new THREE.MeshLambertMaterial({ color: "white" });
+        var sphere = new THREE.Mesh(sphereGeom, sphereMat);
+
+        // add the sphere to the scene
+        scene.add(sphere); 
+    }
+
+    // add lights to the scene
+    function createLights()
+    {
+        // AmbientLight (color, intensity)
+        /*
+        ambientLight = new THREE.AmbientLight("blue");
+        scene.add(ambientLight);
+        */
+
+        // TODO Step 5: add point light
+        // PointLight (color, intensity, fading distance)
+        /*
+        pointLight = new THREE.PointLight("green", 2, 50); 
+        pointLight.position.set( 4, 2, 5 );
+        scene.add(pointLight);
+        //PointLightHelper(light, size)
+        scene.add(new THREE.PointLightHelper(pointLight, 1)); // see where the light is
+        */
+
+        // TODO Step 6: add directional light
+        // DirectionalLight (color, intensity)
+        dirLight = new THREE.DirectionalLight("white", 1); 
+        dirLight.position.set( 5, 0, 5 );
+        scene.add(dirLight);
+
+    }
+
+    // Render the scene. This is called for each frame of the animation.
+    function render() {
+        requestAnimationFrame( render );
+
+        // things to change go here
+        
+        // TODO Step 7: move the directional light
+        angle += 0.01
+
+        dirLight.position.x = Math.cos(angle);
+        dirLight.position.z = Math.sin(angle);
+
+
+        renderer.render(scene, camera);
+
+        mouse.update();
+    }
+
+    //----------------------------------------------------------------------------------
+
+    // The init() function is called by the onload event when the document has loaded.
+    function init() {
+        try {
+            canvas = document.getElementById("glcanvas");
+            renderer = new THREE.WebGLRenderer( { canvas: canvas, antialias: true} );
+        }
+        catch (e) {
+            document.getElementById("canvas-holder").innerHTML = "<h3><b>WebGL is not available.</b><h3>";
+            return;
+        }
+    
+        // create camera
+        createCamera();
+        
+        // create scene 
+        createScene();
+
+        // create lights 
+        createLights();
+
+        // render scene
+        render();
+    }
+
+</script>
+
+</head>
+<body onload="init()">
+<div id="canvas-holder">
+    <canvas id="glcanvas" width="600" height="400"></canvas>
+</div>
+</body>
+</html>
